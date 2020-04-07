@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon"/>
+</head>
+<body>
+    <header>
+        <a href="/security">
+            <img class="logo" src="/img/sfu-logo@2x.png" alt="sfu-logo"/>
+        </a>
+    </header>
+    <div class="container col-md-8 wrapper mb-5" id="app">
+        <div class="container col-md-10 col-xl-10">
+            <div class="row mt-5">
+                <a href="/security">
+                    <svg class="mt-5 mr-4 back-arrow" viewBox="0 0 24 24">
+                        <path fill="#6D6D6D" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" />
+                    </svg>
+                </a>
+                <h1 class="mt-5">Admin Settings</h1>
+            </div>
+
+            <div class="auth-form container">
+                <div class="row mt-4">
+                    <h3>Authorized Security</h3>
+                </div>
+                <div class="row mt-4">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="email in secEmails" class="tr-delete">
+                                <td>{{email.email}}</td>
+                                <td>
+                                    <button class="td-delete-button" v-on:click="deleteSecEmail(email.id)">x</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <form action="" v-on:submit.prevent="addSecEmail" class="form-inline">
+                        <input type="text" placeholder="Email" class="mr-2 form-control" id="sec-email" v-model="secEmail">
+                        <button class="btn btn-success" type="submit" v-on:click="addSecEmail()">Add Email</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-space"></div>
+    </div>
+    <script src="/js/vue.js"></script>
+    <script src="/js/vue-resource.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                secEmail: '',
+                secEmails: []
+            },
+            created: function() {
+                this.getSecEmails();
+            },
+            methods: {
+                getSecEmails: function() {
+                    this.$http.get('/api/authuser/all').then(function(response) {
+                        if (response.status == 200) {
+                            this.secEmails = response.data;
+                        }
+                    })
+                },
+                addSecEmail: function() {
+                    this.$http.post('/api/authuser/add', {email: this.secEmail, privilege: 'SECURITY'})
+                        .then(function(response) {
+                            this.getSecEmails();
+                    });
+                },
+                deleteSecEmail: function(id) {
+                    this.$http.delete('/api/authuser/delete/' + id).then(function(response) {
+                        this.getSecEmails();
+                    })
+                }
+            }
+
+        });
+    </script>
+</body>
+</html>

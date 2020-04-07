@@ -1,0 +1,18 @@
+services:
+  - mysql:latest
+
+variables:
+  # Configure mysql environment variables (https://hub.docker.com/r/_/mysql/)
+  MYSQL_DATABASE: test_database
+  MYSQL_ROOT_PASSWORD: test_password
+
+before_script:
+  - apt-get update -y && apt-get install -y gradle openjdk-8-jdk libmysql-java
+
+build:
+  script:
+    - gradle build -x test --info
+
+test:
+  script:
+    - gradle test --info
